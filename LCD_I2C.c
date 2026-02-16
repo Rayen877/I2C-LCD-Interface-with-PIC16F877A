@@ -23,27 +23,27 @@ unsigned char RS, i2c_add, BackLight_State = LCD_BACKLIGHT;
 void main(void) {
  
   I2C_Init();
-  LCD_Init(0x4E); // Initialize LCD module with I2C address = 0x4E
+  LCD_Init(0x4E); // initialize LCD module with I2C address 0x4E
  
   LCD_Set_Cursor(1, 1);
-  // write anything you want
-  LCD_Write_String(" Hello World!");
+  // write anything 
+  LCD_Write_String(" Rayen Zahzeh");
  
   while(1)
   {
-    LCD_Shift_right();
+    LCD_shift_right();
     __delay_ms(150);
-     LCD_Shift_right();
+     LCD_shift_right();
     __delay_ms(150);
-    LCD_Shift_left();
+    LCD_shift_left();
     __delay_ms(150);
-   LCD_Shift_left();
+   LCD_shift_left();
     __delay_ms(150);
   } 
   return;
 }
  
- 
+ // config
 void I2C_Init()
 {
   SSPCON = 0x28;
@@ -79,16 +79,16 @@ void I2C_Stop()
  
 void I2C_ACK(void)
 {
-  ACKDT = 0; // 0 -> ACK
+  ACKDT = 0; // ACK
   I2C_Wait();
-  ACKEN = 1; // Send ACK
+  ACKEN = 1; // send ACK
 }
  
 void I2C_NACK(void)
 {
-  ACKDT = 1; // 1 -> NACK
+  ACKDT = 1; // NACK
   I2C_Wait();
-  ACKEN = 1; // Send NACK
+  ACKEN = 1; // send NACK
 }
  
 unsigned char I2C_Write(unsigned char data)
@@ -116,7 +116,7 @@ unsigned char I2C_Read_Byte(void)
 void LCD_Init(unsigned char I2C_Add)
 {
   i2c_add = I2C_Add;
-  IO_Write(0x00);
+  lcd_direct_write(0x00);
   __delay_ms(30);
   LCD_CMD(0x03);
   __delay_ms(5);
@@ -136,7 +136,7 @@ void LCD_Init(unsigned char I2C_Add)
   __delay_ms(50);
 }
  
-void IO_Write(unsigned char Data)
+void lcd_direct_write(unsigned char Data)
 {
   I2C_Start();
   I2C_Write(i2c_add);
@@ -146,23 +146,23 @@ void IO_Write(unsigned char Data)
  
 void LCD_Write_4Bit(unsigned char nibble)
 {
-  // Get The RS Value To LSB OF Data
+  // get the RS value to LSB OF Data
   nibble |= RS;
-  IO_Write(nibble | 0x04);
-  IO_Write(nibble & 0xFB);
+  lcd_direct_write(nibble | 0x04);
+  lcd_direct_write(nibble & 0xFB);
   __delay_us(50);
 }
  
 void LCD_CMD(unsigned char CMD)
 {
-  RS = 0; // Command Register Select
+  RS = 0; // command register select
   LCD_Write_4Bit(CMD & 0xF0);
   LCD_Write_4Bit((CMD << 4) & 0xF0);
 }
  
 void LCD_Write_Char(char Data)
 {
-  RS = 1; // Data Register Select
+  RS = 1; // data Register select
   LCD_Write_4Bit(Data & 0xF0);
   LCD_Write_4Bit((Data << 4) & 0xF0);
 }
@@ -195,13 +195,13 @@ void LCD_Set_Cursor(unsigned char ROW, unsigned char COL)
 void Backlight()
 {
   BackLight_State = LCD_BACKLIGHT;
-  IO_Write(0);
+  lcd_direct_write(0);
 }
  
 void noBacklight()
 {
   BackLight_State = LCD_NOBACKLIGHT;
-  IO_Write(0);
+  lcd_direct_write(0);
 }
  
 void LCD_Shift_left()
@@ -220,4 +220,5 @@ void LCD_Clear()
 {
   LCD_CMD(0x01);
   __delay_us(40);
+
 }
